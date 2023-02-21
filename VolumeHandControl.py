@@ -16,9 +16,15 @@ def putFps(img, pTime):
     return img, pTime
 
 
-def drawCircle(lm):
-    x, y = lm[1], lm[2]
+def drawCircle(p):
+    x, y = p[1], p[2]
     cv2.circle(img, (x, y), 10, (255, 0, 0), cv2.FILLED)
+
+
+def drawLine(p1, p2):
+    x1, y1 = p1[1], p1[2]
+    x2, y2 = p2[1], p2[2]
+    cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0), 3)
 
 
 wCam, hCam = 640, 480
@@ -43,7 +49,7 @@ while True:
         """
         drawCircle(lmlist[4])
         drawCircle(lmlist[8])
-
+        drawLine(lmlist[4], lmlist[8])
 
     img, pTime = putFps(img, pTime)
     cv2.imshow('Img', img)
