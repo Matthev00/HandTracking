@@ -16,7 +16,7 @@ def putFps(img, pTime):
 
     cv2.putText(
         img, f'FPS: {int(fps)}', (40, 50),
-        cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 0), 3)
+        cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 0), 2)
     return img, pTime
 
 
@@ -50,6 +50,20 @@ def flipImg(img):
     return fImg
 
 
+def drawRectangle(distance):
+    vol = np.interp(distance, [50, 250], [400, 150])
+    cv2.rectangle(img, (50, 150), (85, 400), (255, 0, 0), 3)
+    cv2.rectangle(img, (50, int(vol)), (85, 400), (255, 0, 0), cv2.FILLED)
+
+
+def drawPer(distance):
+    vol = np.interp(distance, [50, 250], [0, 100])
+    cv2.putText(
+        img, f'{int(vol)}%', (50, 430),
+        cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 2)
+    return img, pTime
+
+
 wCam, hCam = 640, 480
 
 cap = cv2.VideoCapture(0)
@@ -57,7 +71,7 @@ cap.set(3, wCam)
 cap.set(4, hCam)
 pTime = 0
 
-detector = htm.HandDetector(detectionCon=0.7)
+detector = htm.HandDetector(maxHands=1, detectionCon=0.7)
 
 devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(
@@ -65,7 +79,7 @@ interface = devices.Activate(
 volume = cast(interface, POINTER(IAudioEndpointVolume))
 volRnage = volume.GetVolumeRange()
 minVol, maxVol = volRnage[0], volRnage[1]
-#volume.SetMasterVolumeLevel(-20.0, None)
+distance = 160
 
 while True:
     succes, img = cap.read()
@@ -85,13 +99,15 @@ while True:
         distance = countDistance(lmlist[4], lmlist[8])
         if distance < 50:
             drawCircle(lmlist[4], lmlist[8], 1)
+
         """
-        Hand range 25-200
+        Hand range 50-230
         Volume range -65-0
         """
-        vol = np.interp(distance, [25, 200], [minVol, maxVol])
-        print(vol)
-
+        vol = np.interp(distance, [50, 250], [minVol, maxVol])
+        volume.SetMasterVolumeLevel(vol, None)
+    drawRectangle(distance)
+    drawPer(distance)
 
     img, pTime = putFps(img, pTime)
     cv2.imshow('Img', img)
