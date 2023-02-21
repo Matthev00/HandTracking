@@ -23,11 +23,13 @@ cap.set(3, wCam)
 cap.set(4, hCam)
 pTime = 0
 
-# detector = htm.HandDetector()
+detector = htm.HandDetector()
 
 
 while True:
     succes, img = cap.read()
+
+    img = detector.findHands(img)
 
     img, pTime = put_fps(img, pTime)
     cv2.imshow('Img', img)
