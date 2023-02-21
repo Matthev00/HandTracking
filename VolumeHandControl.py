@@ -27,6 +27,11 @@ def drawLine(p1, p2):
     cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0), 3)
 
 
+def flipImg(img):
+    fImg = cv2.flip(img, 1)
+    return fImg
+
+
 wCam, hCam = 640, 480
 
 cap = cv2.VideoCapture(0)
@@ -40,6 +45,7 @@ detector = htm.HandDetector(detectionCon=0.8)
 while True:
     succes, img = cap.read()
 
+    img = flipImg(img)
     img = detector.findHands(img)
     lmlist = detector.findPosition(img, draw=False)
     if len(lmlist):
