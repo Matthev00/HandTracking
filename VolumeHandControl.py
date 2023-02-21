@@ -59,7 +59,13 @@ pTime = 0
 
 detector = htm.HandDetector(detectionCon=0.7)
 
-
+devices = AudioUtilities.GetSpeakers()
+interface = devices.Activate(
+    IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+volume = cast(interface, POINTER(IAudioEndpointVolume))
+volRnage = volume.GetVolumeRange()
+minVol, maxVol = volRnage[0], volRnage[1]
+#volume.SetMasterVolumeLevel(-20.0, None)
 
 while True:
     succes, img = cap.read()
@@ -79,6 +85,12 @@ while True:
         distance = countDistance(lmlist[4], lmlist[8])
         if distance < 50:
             drawCircle(lmlist[4], lmlist[8], 1)
+        """
+        Hand range 25-200
+        Volume range -65-0
+        """
+        vol = np.interp(distance, [25, 200], [minVol, maxVol])
+        print(vol)
 
 
     img, pTime = putFps(img, pTime)
