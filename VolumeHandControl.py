@@ -5,7 +5,7 @@ import time
 import HandTrackingModule as htm
 
 
-def put_fps(img, pTime):
+def putFps(img, pTime):
     cTime = time.time()
     fps = 1/(cTime-pTime)
     pTime = cTime
@@ -16,6 +16,11 @@ def put_fps(img, pTime):
     return img, pTime
 
 
+def drawCircle(lm):
+    x, y = lm[1], lm[2]
+    cv2.circle(img, (x, y), 10, (255, 0, 0), cv2.FILLED)
+
+
 wCam, hCam = 640, 480
 
 cap = cv2.VideoCapture(0)
@@ -23,14 +28,23 @@ cap.set(3, wCam)
 cap.set(4, hCam)
 pTime = 0
 
-detector = htm.HandDetector()
+detector = htm.HandDetector(detectionCon=0.8)
 
 
 while True:
     succes, img = cap.read()
 
     img = detector.findHands(img)
+    lmlist = detector.findPosition(img, draw=False)
+    if len(lmlist):
+        """
+        lm no.4 tip of thumb
+        lm no.8 tip of the index finger
+        """
+        drawCircle(lmlist[4])
+        drawCircle(lmlist[8])
 
-    img, pTime = put_fps(img, pTime)
+
+    img, pTime = putFps(img, pTime)
     cv2.imshow('Img', img)
     cv2.waitKey(1)
